@@ -1,5 +1,8 @@
 DNS Lookup
 ----------
+## Demo
+
+https://dnscheck.greg.ca
 
 ## Installation
 
