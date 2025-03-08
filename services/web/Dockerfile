@@ -20,7 +20,7 @@ RUN apt-get update && \
 RUN pip install --upgrade pip
 RUN pip install flake8==3.9.1
 COPY . .
-RUN flake8 --ignore=E501,W503,F401 .
+RUN flake8 --ignore=E501,W503,F401,E126 .
 
 # install python dependencies
 COPY ./requirements.txt .

@@ -6,6 +6,8 @@ import dns.resolver
 from flask import Flask, render_template, request
 import socket
 
+APP_TITLE = "DNS Lookup Tool"
+
 dig_servers = {
     "Australia (Cloudflare)": "1.1.1.1",
     "Brazil (Claro)": "200.248.178.54",
@@ -31,7 +33,7 @@ def home_domain(domain):
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("home.html")
+    return render_template("home.html", app_title=APP_TITLE)
 
 
 @app.route("/", methods=["POST"])
@@ -52,46 +54,46 @@ def process_domain(dom):
     www_a = str(domain_details[6])
     mail_a = str(domain_details[7])
 
-    results += render_template("home.html", domain=dom)
+    results += render_template("home.html", domain=dom, app_title=APP_TITLE)
 
     results += (
-        "<strong>Domain Resolution:</strong> " + dom + " -> " + ip_address + "<BR><BR>"
+            "<strong>Domain Resolution:</strong> " + dom + " -> " + ip_address + "<BR><BR>"
     )
     results += (
-        "<strong>PTR Resolution:</strong> "
-        + ip_address
-        + " -> "
-        + highlight_text(ptr_record, get_colour(dom, ptr_record))
-        + "<BR><BR>"
+            "<strong>PTR Resolution:</strong> "
+            + ip_address
+            + " -> "
+            + highlight_text(ptr_record, get_colour(dom, ptr_record))
+            + "<BR><BR>"
     )
     results += "<strong>DNS Servers:</strong> " + nameservers + "<BR><BR>"
     results += "<strong>DNS Resolution (Primary A Record):</strong><BR><BR>"
     results += get_propagation(dom, dig_servers, ip_address)
     results += "<BR><strong>Standard DNS Records:</strong><BR><BR>"
     results += (
-        "<strong>Primary A:</strong> "
-        + highlight_text(primary_a, get_colour(ip_address, primary_a))
-        + "<BR>"
+            "<strong>Primary A:</strong> "
+            + highlight_text(primary_a, get_colour(ip_address, primary_a))
+            + "<BR>"
     )
     results += (
-        "<strong>www. A:</strong> "
-        + highlight_text(www_a, get_colour(ip_address, www_a))
-        + "<BR>"
+            "<strong>www. A:</strong> "
+            + highlight_text(www_a, get_colour(ip_address, www_a))
+            + "<BR>"
     )
     results += (
-        "<strong>mail. A:</strong> "
-        + highlight_text(mail_a, get_colour(ip_address, mail_a))
-        + "<BR>"
+            "<strong>mail. A:</strong> "
+            + highlight_text(mail_a, get_colour(ip_address, mail_a))
+            + "<BR>"
     )
     results += (
-        "<strong>MX:</strong> "
-        + highlight_text(primary_mx, get_colour("10 mail." + dom, primary_mx))
-        + "<BR>"
+            "<strong>MX:</strong> "
+            + highlight_text(primary_mx, get_colour("10 mail." + dom, primary_mx))
+            + "<BR>"
     )
     results += (
-        "<strong>TXT:</strong> "
-        + highlight_text(primary_txt, get_colour('"v=spf1 mx a -all"', primary_txt))
-        + "<BR>"
+            "<strong>TXT:</strong> "
+            + highlight_text(primary_txt, get_colour('"v=spf1 mx a -all"', primary_txt))
+            + "<BR>"
     )
     return results
 
@@ -102,11 +104,11 @@ def get_colour(source, target):
 
 def highlight_text(text, colour):
     return (
-        "<span style='font-weight: bold; color: "
-        + str(colour)
-        + "'>"
-        + str(text)
-        + "</span>"
+            "<span style='font-weight: bold; color: "
+            + str(colour)
+            + "'>"
+            + str(text)
+            + "</span>"
     )
 
 
@@ -174,17 +176,17 @@ def get_propagation(dom, servers, ip_address):
                 resolver.nameservers = [socket.gethostbyname(value)]
                 for a_record in resolver.resolve(dom, "A"):
                     results += (
-                        str(highlight_text(a_record, get_colour(a_record, ip_address)))
-                        + "&nbsp;&nbsp;&nbsp;"
+                            str(highlight_text(a_record, get_colour(a_record, ip_address)))
+                            + "&nbsp;&nbsp;&nbsp;"
                     )
                 results += key + "<BR>"
 
             except Exception:
                 results += (
-                    highlight_text(default_text, "red")
-                    + "&nbsp;&nbsp;&nbsp;"
-                    + key
-                    + "<BR>"
+                        highlight_text(default_text, "red")
+                        + "&nbsp;&nbsp;&nbsp;"
+                        + key
+                        + "<BR>"
                 )
 
         return results
