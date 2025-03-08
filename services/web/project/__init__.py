@@ -44,6 +44,9 @@ def home_post():
 def process_domain(dom):
     results = ""
 
+    if dom == "":
+        return "Enter a domain"
+
     domain_details = get_details(dom)
     ip_address = str(domain_details[0])
     ptr_record = str(domain_details[1][0])
