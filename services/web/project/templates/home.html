@@ -1,23 +1,24 @@
 <html data-theme="bumblebee">
 <head>
     <title>{{ app_title }}</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
     {% include 'custom.headers' ignore missing %}
-    <link href="{{ url_for('static', filename='css/tailwind.2.2.19.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/daisyui.2.6.0.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5.0.0/themes.css" rel="stylesheet" type="text/css" />
 </head>
 <body class="p-8">
 <div id="content">
     <h1 class="text-2xl mb-3"><a href="/">{{ app_title }}</a></h1>
     <form method="POST" action="/" class="form pb-7">
         <div class="flex justify-left">
-            <fieldset class="fieldset bg-base-200 border border-base-300 p-8 rounded-box">
-                <input id="domain" class="input input-sm mb-3" name="domain" placeholder="Domain" value="{{ domain }}" autofocus><BR>
-                <input class="btn btn-primary mt-3" type="submit" name="submit" value="Lookup" onclick="$('#loading').show();">
+            <fieldset class="fieldset bg-base-200 border border-base-300 p-10 rounded-box">
+                <input id="domain" class="input" name="domain" placeholder="Domain" value="{{ domain }}" autofocus><BR>
+                <input class="btn btn-accent" type="submit" name="submit" value="Lookup" onclick="$('#loading').show();">
             </fieldset>
         </div>
-        <div id="loading" style="display: none;"><button class="btn btn-primary loading mt-4">loading</button></div>
+        <div id="loading" style="display: none;"><button class="btn btn-accent loading mt-4"></button></div>
     </form>
     {{ page_body|safe }}
 </div>
