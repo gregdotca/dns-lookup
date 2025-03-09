@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-
-# Importing flask module in the project is mandatory
-# An object of Flask class is our WSGI application.
+import socket
 import dns.resolver
 from flask import Flask, render_template, request
-import socket
 
 APP_TITLE = "DNS Lookup Tool"
 
@@ -21,8 +18,6 @@ dig_servers = {
     "USA (Google)": "8.8.8.8",
 }
 
-# Flask constructor takes the name of
-# current module (__name__) as argument.
 app = Flask(__name__, static_folder="assets")
 
 
@@ -44,9 +39,6 @@ def home_post():
 def process_domain(dom):
     results = ""
 
-    if dom == "":
-        return "Enter a domain"
-
     domain_details = get_details(dom)
     ip_address = str(domain_details[0])
     ptr_record = str(domain_details[1][0])
@@ -58,6 +50,10 @@ def process_domain(dom):
     mail_a = str(domain_details[7])
 
     results += render_template("home.html", domain=dom, app_title=APP_TITLE)
+
+    if dom == "":
+        results += "Enter a domain"
+        return results
 
     results += (
             "<strong>Domain Resolution:</strong> " + dom + " -> " + ip_address + "<BR><BR>"
@@ -198,8 +194,5 @@ def get_propagation(dom, servers, ip_address):
         return highlight_text(default_text, "red")
 
 
-# main driver function
 if __name__ == "__main__":
-    # run() method of Flask class runs the application
-    # on the local development server.
     app.run()
