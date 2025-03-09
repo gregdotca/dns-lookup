@@ -14,9 +14,9 @@ dig_servers = {
     "Canada (Fortinet)": "208.91.112.53",
     "China (Aliyun)": "223.5.5.5",
     "Netherlands (OpenTLD)": "80.80.80.80",
-    "Russia (IONICA)": "176.103.130.130",
+    # "Russia (IONICA)": "176.103.130.130",
     "South Africa (Liquid)": "5.11.11.5",
-    "Switzerland (Oskar Emmenegger)": "194.209.157.109",
+    # "Switzerland (Oskar Emmenegger)": "194.209.157.109",
     # "UK (Onyx)": "195.97.240.237",
     "USA (Google)": "8.8.8.8",
 }
