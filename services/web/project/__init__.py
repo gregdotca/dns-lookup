@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import socket
 import dns.resolver
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request
 
 APP_TITLE = "DNS Lookup Tool"
+DEFAULT_DOMAIN = "example.com"
 
 dig_servers = {
     "Australia (Cloudflare)": "1.1.1.1",
@@ -21,19 +22,17 @@ dig_servers = {
 app = Flask(__name__, static_folder="assets")
 
 
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if request.method == "GET":
+        return render_template("home.html", app_title=APP_TITLE)
+    else:
+        return redirect("/" + request.form["domain"])
+
+
 @app.route("/<domain>", methods=["GET"])
 def home_domain(domain):
     return process_domain(domain)
-
-
-@app.route("/", methods=["GET"])
-def home():
-    return render_template("home.html", app_title=APP_TITLE)
-
-
-@app.route("/", methods=["POST"])
-def home_post():
-    return process_domain(request.form["domain"])
 
 
 def process_domain(dom):
