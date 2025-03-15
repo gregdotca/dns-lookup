@@ -3,7 +3,7 @@ import socket
 import dns.resolver
 from flask import Flask, redirect, render_template, request
 
-APP_TITLE = "DNS Lookup Tool"
+APP_TITLE = "DNS Lookup"
 DEFAULT_DOMAIN = "example.com"
 
 dig_servers = {
