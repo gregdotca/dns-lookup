@@ -3,7 +3,7 @@
 services:
 
   web:
-    container_name: greg_ca_dnscheck
+    container_name: dnscheck
     build:
       context: ./services/web
       dockerfile: Dockerfile
