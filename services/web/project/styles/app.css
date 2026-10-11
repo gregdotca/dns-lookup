@@ -4,5 +4,26 @@
 
 /* daisyUI 5.7.46, from https://github.com/saadeghi/daisyui/releases */
 @plugin "./daisyui-5.7.46.mjs" {
-    themes: bumblebee --default;
+    themes: bumblebee --default, business --prefersdark;
+}
+
+/* Lookup result colours, used by highlight_text() in project/__init__.py. Each one has
+   at least 4.5:1 contrast against its mode's background. */
+:root {
+    --result-green: #008000;
+    --result-red: #cc0000;
+}
+
+/* Dark mode tweaks: a darker blue than business's primary (oklch(41.703% .099 251.473)) for
+   the Lookup button, bumblebee's rounder corners (values from the bumblebee theme), and
+   lighter result colours. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --color-primary: oklch(34% .085 251.473);
+        --radius-selector: 1rem;
+        --radius-field: .5rem;
+        --radius-box: 1rem;
+        --result-green: #4ade80;
+        --result-red: #f87171;
+    }
 }

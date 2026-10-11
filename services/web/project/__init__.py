@@ -102,9 +102,9 @@ def get_colour(source, target):
 
 def highlight_text(text, colour):
     return (
-            "<span style='font-weight: bold; color: "
+            "<span style='font-weight: bold; color: var(--result-"
             + str(colour)
-            + "'>"
+            + ")'>"
             + str(text)
             + "</span>"
     )
