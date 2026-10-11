@@ -1,0 +1,8 @@
+/* Built into project/assets/app.css by the Tailwind standalone CLI (see Dockerfile). */
+@import "tailwindcss" source(none);
+@source "../templates";
+
+/* daisyUI 5.7.46, from https://github.com/saadeghi/daisyui/releases */
+@plugin "./daisyui-5.7.46.mjs" {
+    themes: bumblebee --default;
+}
