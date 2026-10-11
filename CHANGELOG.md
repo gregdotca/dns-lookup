@@ -2,6 +2,12 @@
 
 ## 2026-10-11
 
+### Add AI Code Rating, update copyright and README
+
+- `ACR.md`: new [AI Code Rating](https://aicoderating.com/) file, rated B1b (Experienced maintainer, AI wrote 1–25% of the code, all of it read by the maintainer). `README.md` links to it with a badge under the title.
+- `LICENSE`, `README.md`: copyright updated from `2024` to `2024-2026`, with the maintainer's email.
+- `README.md`: the install step said to load `https://IP_ADDRESS:8086`, but gunicorn serves plain HTTP on that port, so the link now uses `http://`.
+
 ### Label the domain input for screen readers
 
 - The domain input had only a `placeholder`, which isn't a reliable accessible name, so screen readers could announce it as an unlabelled text field.
