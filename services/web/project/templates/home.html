@@ -13,7 +13,7 @@
     <form method="POST" action="/" class="form pb-7">
         <div class="flex justify-left">
             <fieldset class="fieldset bg-base-200 border border-base-300 p-10 -ml-1 rounded-box">
-                <input id="domain" class="input" name="domain" placeholder="Domain" value="{{ domain }}" autofocus><BR>
+                <input id="domain" class="input" name="domain" aria-label="Domain" placeholder="Domain" value="{{ domain }}" autofocus><BR>
                 <input class="btn btn-accent dark:btn-primary" type="submit" name="submit" value="Lookup" onclick="$('#loading').show();">
             </fieldset>
         </div>
