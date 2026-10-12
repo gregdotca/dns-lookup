@@ -43,6 +43,10 @@ RUN tailwindcss -i project/styles/app.css -o project/assets/app.css --minify
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
+# run the tests
+RUN pip install --no-cache-dir -r requirements.txt pytest==9.1.1
+RUN pytest -q -p no:cacheprovider
+
 
 #########
 # FINAL #

@@ -28,7 +28,11 @@ Lint (the production Docker build runs this and fails on errors):
 cd services/web && flake8 --ignore=E501,W503,F401,E126 .
 ```
 
-There are no tests.
+Tests (pytest, in `services/web/tests/`; the production Docker build runs them after installing the requirements and fails if any fail; they monkeypatch the DNS lookups, so they need no network):
+
+```sh
+cd services/web && pip install pytest && pytest
+```
 
 ### DEV/PROD environment swap
 
@@ -40,7 +44,7 @@ All application logic lives in `services/web/project/__init__.py`; `services/web
 
 - `GET /` renders the empty form; `POST /` redirects to `/<domain>`; `GET /<domain>` runs the lookup.
 - `get_details()` does every lookup (via `socket` and `dnspython`), returning a positional list (PTR is just the hostname; MX records are formatted by `format_mx()`, which drops each exchange's final dot except on a null MX); each failure is swallowed and replaced with `*MISSING*`. `process_domain()` unpacks that list by index, so the order of its return values matters.
-- `get_propagation()` queries each resolver in the `dig_servers` dict and marks results green/red against the system resolver's IP.
+- A record colours compare against the full set of primary A records (`expected_ips` in `process_domain()`, falling back to the system resolver's single IP), since a domain can have several. Primary A is green whenever it has addresses, since it's the set the others are checked against (`gethostbyname()` can return a different address from the same pool); `www.`/`mail.` A are green if they have the same set (`get_address_colour()`). `get_propagation()` queries each resolver in the `dig_servers` dict and marks each address green if it's in that set.
 - Results are built as raw HTML strings and passed to `home.html` as `page_body` (rendered with `|safe`) by `render_page()`. Values are colour-coded (`var(--result-green)`/`var(--result-red)`, defined in `app.css`) with `highlight_text()`/`get_colour()` against hard-coded "expected" values (e.g. MX `10 mail.<domain>`, SPF `"v=spf1 mx a -all"`). The domain and every DNS answer must go through `str(escape(...))` (`markupsafe`) before they're concatenated; `highlight_text()` escapes its text itself. Keep the `str()`: adding a plain string to a `Markup` object escapes the plain string too, which would escape the result HTML. `POST /` quotes the domain with `safe=""` before redirecting, so a value like `/evil.com` can't become a protocol-relative redirect.
 - Static files are served from `project/assets/` at `/assets/...` (Flask's `static_folder`; use `url_for('static', ...)`). The favicon is there; the page uses no JavaScript library (the loading spinner is a one-line `onclick`). `home.html` optionally includes `templates/custom.headers` (gitignored), which is used for site-specific extra `<head>` content like analytics.
 - **CSS build:** Tailwind 4 and daisyUI 5 are built at Docker build time, not loaded from a CDN. The Tailwind standalone CLI (version and per-architecture SHA-256s pinned as `ARG`s in the Dockerfile builder stage, and in `Dockerfile.DEV`) compiles `project/styles/app.css` into `project/assets/app.css` (gitignored), scanning only `project/templates/`. daisyUI is the vendored plugin `project/styles/daisyui-<version>.mjs`. To upgrade, update the `ARG`s, or replace the `.mjs` file and its reference in `app.css`. A class used only from Python (like the results HTML) won't be in the build unless it also appears in a template; the results use inline styles, so they're unaffected.

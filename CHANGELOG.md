@@ -2,6 +2,17 @@
 
 ## 2026-10-11
 
+### Fix A record colours, pin dnspython, add tests
+
+- Fix correct A records being marked red on domains with several of them. The expected address was the one IP from `socket.gethostbyname()`, so on a round-robin domain like `example.com` (two A records), Primary A and `www.` A (which list both) could never match it and were always red, and in the propagation check one address per resolver was green and the other red, changing from one lookup to the next. Results now compare against the full set of primary A records, falling back to the single IP when there are none (tested: every `example.com` address is now green).
+  - `services/web/project/__init__.py`: `process_domain()` builds `expected_ips`. Primary A is green whenever it has addresses, since it's the set the others are checked against (`gethostbyname()` makes its own query and can get a different address from the same pool, which would wrongly turn Primary A red), and `www.`/`mail.` A are green if they have the same set of addresses (new `address_set()` and `get_address_colour()`). `get_propagation()` takes the set and marks each address separately. New `MISSING_TEXT` constant for `*MISSING*`.
+- Pin `dnspython` to 2.9.0, the version the site was built and tested with. It was the only unpinned dependency, so every rebuild installed the newest release, which could break the site with no change here.
+  - `services/web/requirements.txt`: `dnspython==2.9.0`.
+- Add tests. There were none. They cover MX formatting, escaping, the redirect quoting, the results' place in the page, and the A record colours, with the DNS lookups monkeypatched so they need no network (11 tests).
+  - `services/web/tests/test_app.py`, `services/web/pytest.ini`: new.
+  - `services/web/Dockerfile`: the builder stage installs the requirements and pytest 9.1.1 and runs the tests, so a failing test stops the build, as flake8 errors already do.
+- `CLAUDE.md`: document the tests and how the A record colours work.
+
 ### Fix PTR and MX output, page markup, and drop jQuery
 
 - Fix the PTR result showing `*` when the reverse lookup failed. `socket.getnameinfo()` returns a `(host, port)` tuple, and `process_domain()` took `[0]` of it, but on failure the value was the string `*MISSING*`, so `[0]` took its first character. `get_details()` now takes the hostname itself, so a failure shows `*MISSING*`.

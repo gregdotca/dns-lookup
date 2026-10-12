@@ -9,6 +9,7 @@ from markupsafe import escape
 
 APP_TITLE = "DNS Lookup"
 DEFAULT_DOMAIN = "example.com"
+MISSING_TEXT = "*MISSING*"
 
 dig_servers = {
     "Australia (Cloudflare)": "1.1.1.1",
@@ -57,6 +58,11 @@ def process_domain(dom):
     if dom == "":
         return render_page(dom, "Enter a domain")
 
+    # a domain can have several A records, so compare against all of them,
+    # falling back to the system resolver's single address
+    primary_ips = address_set(primary_a)
+    expected_ips = primary_ips or address_set(ip_address)
+
     results += (
             "<strong>Domain Resolution:</strong> " + str(escape(dom)) + " -> " + str(escape(ip_address)) + "<BR><BR>"
     )
@@ -69,21 +75,21 @@ def process_domain(dom):
     )
     results += "<strong>DNS Servers:</strong> " + str(escape(nameservers)) + "<BR><BR>"
     results += "<strong>DNS Resolution (Primary A Record):</strong><BR><BR>"
-    results += get_propagation(dom, dig_servers, ip_address)
+    results += get_propagation(dom, dig_servers, expected_ips)
     results += "<BR><strong>Standard DNS Records:</strong><BR><BR>"
     results += (
             "<strong>Primary A:</strong> "
-            + highlight_text(primary_a, get_colour(ip_address, primary_a))
+            + highlight_text(primary_a, "green" if primary_ips else "red")
             + "<BR>"
     )
     results += (
             "<strong>www. A:</strong> "
-            + highlight_text(www_a, get_colour(ip_address, www_a))
+            + highlight_text(www_a, get_address_colour(expected_ips, address_set(www_a)))
             + "<BR>"
     )
     results += (
             "<strong>mail. A:</strong> "
-            + highlight_text(mail_a, get_colour(ip_address, mail_a))
+            + highlight_text(mail_a, get_address_colour(expected_ips, address_set(mail_a)))
             + "<BR>"
     )
     results += (
@@ -109,6 +115,14 @@ def get_colour(source, target):
     return "green" if str(source) == str(target) else "red"
 
 
+def address_set(text):
+    return set() if text == MISSING_TEXT else set(text.split(", "))
+
+
+def get_address_colour(expected, addresses):
+    return "green" if addresses and addresses == expected else "red"
+
+
 def highlight_text(text, colour):
     return (
             "<span style='font-weight: bold; color: var(--result-"
@@ -120,7 +134,7 @@ def highlight_text(text, colour):
 
 
 def get_details(dom):
-    default_text = "*MISSING*"
+    default_text = MISSING_TEXT
 
     try:
         ip = socket.gethostbyname(dom)
@@ -179,7 +193,7 @@ def format_mx(mx):
     return str(mx.preference) + " " + mx.exchange.to_text(omit_final_dot=True)
 
 
-def get_propagation(dom, servers, ip_address):
+def get_propagation(dom, servers, expected_ips):
     default_text = "*FAILED*"
 
     try:
@@ -193,7 +207,7 @@ def get_propagation(dom, servers, ip_address):
                 resolver.nameservers = [socket.gethostbyname(value)]
                 for a_record in resolver.resolve(dom, "A"):
                     results += (
-                            str(highlight_text(a_record, get_colour(a_record, ip_address)))
+                            str(highlight_text(a_record, "green" if str(a_record) in expected_ips else "red"))
                             + "&nbsp;&nbsp;&nbsp;"
                     )
                 results += key + "<BR>"
