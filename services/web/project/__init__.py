@@ -2,6 +2,7 @@
 import socket
 from urllib.parse import quote
 
+import dns.name
 import dns.resolver
 from flask import Flask, redirect, render_template, request
 from markupsafe import escape
@@ -45,19 +46,16 @@ def process_domain(dom):
 
     domain_details = get_details(dom)
     ip_address = str(domain_details[0])
-    ptr_record = str(domain_details[1][0])
+    ptr_record = str(domain_details[1])
     nameservers = str(domain_details[2])
     primary_a = str(domain_details[3])
-    primary_mx = str(domain_details[4])[:-1]
+    primary_mx = str(domain_details[4])
     primary_txt = str(domain_details[5])
     www_a = str(domain_details[6])
     mail_a = str(domain_details[7])
 
-    results += render_template("home.html", domain=dom, app_title=APP_TITLE)
-
     if dom == "":
-        results += "Enter a domain"
-        return results
+        return render_page(dom, "Enter a domain")
 
     results += (
             "<strong>Domain Resolution:</strong> " + str(escape(dom)) + " -> " + str(escape(ip_address)) + "<BR><BR>"
@@ -98,7 +96,13 @@ def process_domain(dom):
             + highlight_text(primary_txt, get_colour('"v=spf1 mx a -all"', primary_txt))
             + "<BR>"
     )
-    return results
+    return render_page(dom, results)
+
+
+def render_page(dom, page_body):
+    return render_template(
+        "home.html", domain=dom, app_title=APP_TITLE, page_body=page_body
+    )
 
 
 def get_colour(source, target):
@@ -124,7 +128,7 @@ def get_details(dom):
         ip = default_text
 
     try:
-        ptr = socket.getnameinfo((ip, 0), 0)
+        ptr = socket.getnameinfo((ip, 0), 0)[0]
     except Exception:
         ptr = default_text
 
@@ -142,7 +146,7 @@ def get_details(dom):
 
     try:
         primary_mx_raw = dns.resolver.resolve(dom, "MX")
-        primary_mx = ", ".join([str(x) for x in primary_mx_raw])
+        primary_mx = ", ".join([format_mx(x) for x in primary_mx_raw])
     except Exception:
         primary_mx = default_text
 
@@ -165,6 +169,14 @@ def get_details(dom):
         mail_a = default_text
 
     return [ip, ptr, ns, primary_a, primary_mx, primary_txt, www_a, mail_a]
+
+
+def format_mx(mx):
+    # drop the final dot ("10 mail.example.com"), except on a null MX,
+    # whose exchange is the root itself ("0 .")
+    if mx.exchange == dns.name.root:
+        return str(mx)
+    return str(mx.preference) + " " + mx.exchange.to_text(omit_final_dot=True)
 
 
 def get_propagation(dom, servers, ip_address):

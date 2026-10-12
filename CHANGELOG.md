@@ -2,6 +2,21 @@
 
 ## 2026-10-11
 
+### Fix PTR and MX output, page markup, and drop jQuery
+
+- Fix the PTR result showing `*` when the reverse lookup failed. `socket.getnameinfo()` returns a `(host, port)` tuple, and `process_domain()` took `[0]` of it, but on failure the value was the string `*MISSING*`, so `[0]` took its first character. `get_details()` now takes the hostname itself, so a failure shows `*MISSING*`.
+  - `services/web/project/__init__.py`: `get_details()` takes `getnameinfo(...)[0]`, and `process_domain()` uses the value as-is.
+- Fix MX output being cut short. `process_domain()` trimmed the last character off the whole joined MX string to remove a trailing dot, so `*MISSING*` showed as `*MISSING`, a null MX (`0 .`, as on `example.com`) showed as `0 `, and with several MX records only the last one lost its dot. Each record's exchange now drops its own final dot, and a null MX stays `0 .` (tested on `example.com`, `gmail.com` with five records, and `outlook.com`).
+  - `services/web/project/__init__.py`: new `format_mx()`, used by `get_details()`; the `[:-1]` in `process_domain()` is gone.
+- Fix the results being added after `</html>`, which made the page invalid HTML. They're now passed into the template's existing `{{ page_body|safe }}` slot, inside `#content`.
+  - `services/web/project/__init__.py`: new `render_page()`, used by `process_domain()`.
+- Add the missing basic markup. Without a doctype, browsers rendered the page in quirks mode, and without a viewport tag, phones showed it zoomed out to desktop width.
+  - `services/web/project/templates/home.html`: add `<!doctype html>`, `lang="en"`, a UTF-8 `charset` meta tag, and a viewport meta tag.
+- Remove jQuery (about 87 KB), which was loaded only to show the loading spinner. The Lookup button's `onclick` now shows it with one line of plain JavaScript.
+  - `services/web/project/templates/home.html`: drop the jQuery `<script>` tag and use `document.getElementById()`.
+  - `services/web/project/assets/jquery-3.7.1.min.js`: removed.
+- `CLAUDE.md`: document `format_mx()`, `render_page()`, and the removal of jQuery.
+
 ### Escape results, speed up lookups, update Python
 
 - Fix one slow DNS server blocking the whole site. gunicorn ran a single sync worker, and the propagation check waited up to dnspython's default 5 seconds for each resolver that didn't answer, so a lookup with a dead resolver made every other visitor wait behind it. gunicorn now runs 4 workers, and each propagation resolver gets 2 seconds (tested: an unreachable resolver now fails after 2.1 seconds, and 4 simultaneous lookups all finished in about 0.8 seconds).
