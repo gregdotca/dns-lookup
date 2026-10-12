@@ -2,6 +2,11 @@
 
 ## 2026-10-12
 
+### Update Python to 3.14.8
+
+- Move both stages of `services/web/Dockerfile` from `python:3.14.7-slim` to `python:3.14.8-slim`. 3.14.8 is an expedited security release (fixes for SSL and tarfile bugs, among others). `CLAUDE.md` only says Python 3.14, so it doesn't change.
+- Tested in the production image: flake8 and all 11 tests pass during the build, the page and its assets load, and an `example.com` propagation check gets answers from the resolvers in under a second. The locally excluded dev Dockerfile isn't in the repo; it was moved to 3.14.8 by hand to match.
+
 ### Add Dependabot version updates
 
 - Add `.github/dependabot.yml`. Dependabot alerts and security fix PRs (set in the GitHub repo's settings, not in this file) only cover known vulnerabilities; nothing kept the pinned packages or the Python base image current otherwise. Dependabot now checks `services/web/requirements.txt` and the Python base image in `services/web/Dockerfile` once a month, with all pip updates grouped into one PR. It only proposes versions that have been out for at least 7 days, so a bad or hijacked release has time to be caught and pulled first; security fix PRs aren't delayed.
