@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-12
+
+### Add Dependabot version updates
+
+- Add `.github/dependabot.yml`. Dependabot alerts and security fix PRs (set in the GitHub repo's settings, not in this file) only cover known vulnerabilities; nothing kept the pinned packages or the Python base image current otherwise. Dependabot now checks `services/web/requirements.txt` and the Python base image in `services/web/Dockerfile` once a month, with all pip updates grouped into one PR. It only proposes versions that have been out for at least 7 days, so a bad or hijacked release has time to be caught and pulled first; security fix PRs aren't delayed.
+- The versions pinned inside the `Dockerfile`'s build steps (flake8, pytest, and the Tailwind CLI) aren't covered and still need updating by hand. GitHub Actions isn't included because the repo has no workflows.
+
 ## 2026-10-11
 
 ### Retire the Netherlands resolver, update site URL

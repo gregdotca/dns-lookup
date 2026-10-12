@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /services/web
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      pip:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: /services/web
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
