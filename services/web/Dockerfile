@@ -3,7 +3,7 @@
 ###########
 
 # pull official base image
-FROM python:3.9.21-slim as builder
+FROM python:3.14.7-slim AS builder
 
 # set work directory
 WORKDIR /usr/src/app
@@ -32,7 +32,7 @@ RUN case "$(dpkg --print-architecture)" in \
 
 # lint
 RUN pip install --upgrade pip
-RUN pip install flake8==3.9.1
+RUN pip install flake8==7.4.1
 COPY . .
 RUN flake8 --ignore=E501,W503,F401,E126 .
 
@@ -49,7 +49,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # pull official base image
-FROM python:3.9.21-slim
+FROM python:3.14.7-slim
 
 # create directory for the app user
 RUN mkdir -p /home/app

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import socket
+from urllib.parse import quote
+
 import dns.resolver
 from flask import Flask, redirect, render_template, request
+from markupsafe import escape
 
 APP_TITLE = "DNS Lookup"
 DEFAULT_DOMAIN = "example.com"
@@ -27,7 +30,9 @@ def home():
     if request.method == "GET":
         return render_template("home.html", app_title=APP_TITLE)
     else:
-        return redirect("/" + request.form["domain"])
+        # quote everything, including "/", so "/evil.com" can't become a
+        # protocol-relative redirect to another site
+        return redirect("/" + quote(request.form["domain"], safe=""))
 
 
 @app.route("/<domain>", methods=["GET"])
@@ -55,16 +60,16 @@ def process_domain(dom):
         return results
 
     results += (
-            "<strong>Domain Resolution:</strong> " + dom + " -> " + ip_address + "<BR><BR>"
+            "<strong>Domain Resolution:</strong> " + str(escape(dom)) + " -> " + str(escape(ip_address)) + "<BR><BR>"
     )
     results += (
             "<strong>PTR Resolution:</strong> "
-            + ip_address
+            + str(escape(ip_address))
             + " -> "
             + highlight_text(ptr_record, get_colour(dom, ptr_record))
             + "<BR><BR>"
     )
-    results += "<strong>DNS Servers:</strong> " + nameservers + "<BR><BR>"
+    results += "<strong>DNS Servers:</strong> " + str(escape(nameservers)) + "<BR><BR>"
     results += "<strong>DNS Resolution (Primary A Record):</strong><BR><BR>"
     results += get_propagation(dom, dig_servers, ip_address)
     results += "<BR><strong>Standard DNS Records:</strong><BR><BR>"
@@ -105,7 +110,7 @@ def highlight_text(text, colour):
             "<span style='font-weight: bold; color: var(--result-"
             + str(colour)
             + ")'>"
-            + str(text)
+            + str(escape(str(text)))
             + "</span>"
     )
 
@@ -168,6 +173,8 @@ def get_propagation(dom, servers, ip_address):
     try:
         results = ""
         resolver = dns.resolver.Resolver()
+        # give up on a resolver after 2 seconds instead of dnspython's default 5
+        resolver.lifetime = 2
 
         for key, value in servers.items():
             try:

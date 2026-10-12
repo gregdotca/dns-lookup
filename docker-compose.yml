@@ -7,7 +7,7 @@ services:
     build:
       context: ./services/web
       dockerfile: Dockerfile
-    command: bash -c 'gunicorn --bind 0.0.0.0:5000 manage:app'
+    command: bash -c 'gunicorn --bind 0.0.0.0:5000 --workers 4 --no-control-socket manage:app'
     ports:
       - 8086:5000
     restart: unless-stopped
