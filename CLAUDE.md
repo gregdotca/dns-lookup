@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-DNS Lookup is a single-page Flask app that reports DNS details for a domain (A, PTR, NS, MX, TXT, `www.`/`mail.` A records) and checks A-record propagation against a fixed list of public resolvers around the world. Live demo: https://dnscheck.greg.ca
+DNS Lookup is a single-page Flask app that reports DNS details for a domain (A, PTR, NS, MX, TXT, `www.`/`mail.` A records) and checks A-record propagation against a fixed list of public resolvers around the world. Live demo: https://dns.greg.ca
 
 ## Commands
 

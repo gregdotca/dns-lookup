@@ -16,7 +16,7 @@ dig_servers = {
     "Brazil (Claro)": "200.248.178.54",
     "Canada (Fortinet)": "208.91.112.53",
     "China (Aliyun)": "223.5.5.5",
-    "Netherlands (OpenTLD)": "80.80.80.80",
+    # "Netherlands (OpenTLD)": "80.80.80.80",
     # "Russia (IONICA)": "176.103.130.130",
     "South Africa (Liquid)": "5.11.11.5",
     # "Switzerland (Oskar Emmenegger)": "194.209.157.109",

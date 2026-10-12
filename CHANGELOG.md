@@ -2,6 +2,13 @@
 
 ## 2026-10-11
 
+### Retire the Netherlands resolver, update site URL
+
+- Comment out the Netherlands (OpenTLD, `80.80.80.80`) resolver in the propagation check. It no longer answers: it timed out for every domain tried, both from the live server and from elsewhere, so every lookup showed `*FAILED*` for it and waited out its 2-second timeout (lookups of `example.com` took about 4.7 seconds). It's kept as a comment, like the other retired resolvers.
+  - `services/web/project/__init__.py`: comment out the entry in `dig_servers`.
+- Update the live site's URL from `https://dnscheck.greg.ca` to `https://dns.greg.ca`, where the old address now redirects.
+  - `README.md`, `CLAUDE.md`: new URL. The container is still named `dnscheck`.
+
 ### Fix A record colours, pin dnspython, add tests
 
 - Fix correct A records being marked red on domains with several of them. The expected address was the one IP from `socket.gethostbyname()`, so on a round-robin domain like `example.com` (two A records), Primary A and `www.` A (which list both) could never match it and were always red, and in the propagation check one address per resolver was green and the other red, changing from one lookup to the next. Results now compare against the full set of primary A records, falling back to the single IP when there are none (tested: every `example.com` address is now green).

@@ -5,7 +5,7 @@ DNS Lookup
 
 ## Demo
 
-https://dnscheck.greg.ca
+https://dns.greg.ca
 
 ## Installation
 
