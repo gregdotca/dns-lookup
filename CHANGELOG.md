@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-21
+
+### Bind the published port to 127.0.0.1 by default
+
+- `docker-compose.yml`: publish the port as `${BIND_ADDRESS:-127.0.0.1}:8086:5000` instead of `8086:5000`. Without an address, Docker publishes the port on every interface and adds its own firewall rules for it, so on a server with a public IP the app could be reached directly on port 8086, skipping the reverse proxy in front of it. It now listens only on 127.0.0.1 unless `BIND_ADDRESS` is set, in the shell or in a `.env` file next to `docker-compose.yml`.
+- `.gitignore`: ignore `/.env`, so a server's own bind address is never committed.
+- `README.md`: the installation steps now load the app at `http://127.0.0.1:8086`, with a note on the default (and that Docker Engine before 28.0.0 still lets machines on the same local network reach ports published on 127.0.0.1) and how to change it with `BIND_ADDRESS`.
+
 ## 2026-10-12
 
 ### Update Python to 3.14.8

@@ -11,7 +11,9 @@ https://dns.greg.ca
 
 - Clone the repository
 - Run "docker-compose up -d"
-- Load http://IP_ADDRESS:8086 in your web browser
+- Load http://127.0.0.1:8086 in your web browser on the same machine
+
+The port listens on 127.0.0.1 by default, so it's only reachable from the host itself (with Docker Engine 28.0.0 or later; older versions also let machines on the same local network reach ports published on 127.0.0.1). Put a reverse proxy in front of it to serve it publicly. To listen on another address, set `BIND_ADDRESS`, either in the shell or in a `.env` file next to `docker-compose.yml`, for example `BIND_ADDRESS=0.0.0.0` to listen on every interface.
 
 ## License
 

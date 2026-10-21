@@ -8,7 +8,7 @@ DNS Lookup is a single-page Flask app that reports DNS details for a domain (A, 
 
 ## Commands
 
-Production (gunicorn, port 8086 on the host, container name `dnscheck`):
+Production (gunicorn, port 8086 on the host, container name `dnscheck`). The port is published on `${BIND_ADDRESS:-127.0.0.1}`, so it listens only on localhost unless `BIND_ADDRESS` is set in the shell or in a gitignored `.env` next to `docker-compose.yml`; never put a server's real IP in the repo:
 
 ```sh
 docker-compose up -d --build
