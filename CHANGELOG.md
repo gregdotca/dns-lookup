@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-11
+
+### Link the rating in ACR.md to its page
+
+- `ACR.md`: the bold rating line now links to the rating's page on aicoderating.com (`https://aicoderating.com/B1b/`). The rating itself is unchanged.
+
 ## 2026-10-21
 
 ### Bind the published port to 127.0.0.1 by default
